@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Student</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            text-align: center;
+            padding: 35px 15px;
+        }
+        .container {
+            background: white;
+            max-width: 450px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #0001;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 9px 0;
+            box-sizing: border-box;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        #message { overflow-wrap: anywhere; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Add Student</h1>
+
+    <form id="studentForm">
+        <input id="name" placeholder="Student Name" required>
+        <input id="rollNumber" placeholder="Roll Number" required>
+        <input id="department" placeholder="Department (e.g. CSE)" required>
+        <input id="year" type="number" min="1" max="6"
+               placeholder="Year (e.g. 3)" required>
+        <input id="email" type="email" placeholder="Email (optional)">
+
+        <button type="submit">Add Student</button>
+    </form>
+
+    <p id="message" role="status"></p>
+    <a href="/">Back to Home</a>
+</div>
+
+<script>
+document.getElementById("studentForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const student = {
+        name: document.getElementById("name").value.trim(),
+        rollNumber: document.getElementById("rollNumber").value.trim(),
+        department: document.getElementById("department").value.trim(),
+        year: document.getElementById("year").value,
+        email: document.getElementById("email").value.trim() || null
+    };
+
+    const message = document.getElementById("message");
+    message.textContent = "Saving student...";
+
+    try {
+        const response = await fetch("/api/students", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(student)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            message.textContent = "Student saved successfully!";
+            message.style.color = "green";
+            document.getElementById("studentForm").reset();
+        } else {
+            message.textContent = result.error || "Could not save student.";
+            message.style.color = "red";
+        }
+    } catch (error) {
+        message.textContent = "Server connection failed. Check that Java is running.";
+        message.style.color = "red";
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student List</title>
+<style>
+body{font-family:Arial;background:#f1f5f9;padding:30px}
+.container{max-width:950px;margin:auto;background:white;padding:25px;border-radius:12px}
+h1{color:#1e3a8a}
+button{background:#2563eb;color:white;border:0;padding:10px 16px;border-radius:6px;cursor:pointer}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{padding:13px;border-bottom:1px solid #ddd;text-align:left}
+th{background:#6d3bd1;color:white}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Student List</h1>
+<button onclick="loadStudents()">Refresh List</button>
+<p id="message">Loading students...</p>
+<table>
+<thead>
+<tr><th>ID</th><th>Roll Number</th><th>Name</th><th>Department</th><th>Year</th><th>Email</th></tr>
+</thead>
+<tbody id="studentRows"></tbody>
+</table>
+<p><a href="/">Back to Dashboard</a></p>
+</div>
+<script>
+async function loadStudents(){
+ const message=document.getElementById("message");
+ const rows=document.getElementById("studentRows");
+ message.textContent="Loading...";
+ try{
+  const response=await fetch("/api/students");
+  if(!response.ok) throw new Error("Failed to load");
+  const students=await response.json();
+  rows.replaceChildren();
+  students.forEach(s=>{
+   const tr=document.createElement("tr");
+   [s.id,s.rollNumber,s.name,s.department,s.year,s.email||"-"].forEach(value=>{
+    const td=document.createElement("td");
+    td.textContent=value??"-";
+    tr.appendChild(td);
+   });
+   rows.appendChild(tr);
+  });
+  message.textContent=students.length+" student(s) found.";
+ }catch(error){
+  message.textContent="Unable to load students. Check that Java server is running.";
+ }
+}
+loadStudents();
+</script>
+</body>
+</html>

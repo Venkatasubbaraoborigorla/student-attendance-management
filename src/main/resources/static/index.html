@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Portal Dashboard</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f0f4f9;color:#19324e}
+.sidebar{width:250px;min-height:100vh;background:#172c43;color:white;position:fixed;padding:22px 14px}
+.sidebar h2{margin:8px 5px 25px}
+.sidebar a{display:block;color:white;text-decoration:none;padding:13px 12px;margin:6px 0;border-radius:8px}
+.sidebar a:hover,.sidebar a.active{background:#9343dc}
+main{margin-left:250px;padding:24px}
+.welcome,.panel,.date-box,.card{background:white;border-radius:14px;padding:20px;margin-bottom:20px}
+.welcome{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.welcome h2{margin-top:0}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:16px}
+.card{border-left:5px solid #9145ed}
+.card:nth-child(2){border-color:#10a66a}
+.card:nth-child(3){border-color:#f04459}
+.card:nth-child(4){border-color:#d43ab2}
+.card p{color:#66758a}
+.number{font-size:30px;font-weight:bold;color:#783bdb;margin:10px 0}
+.content-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+button{background:#713bd1;color:white;border:0;padding:11px 16px;border-radius:8px;cursor:pointer;margin:4px 3px}
+button:hover{opacity:.86}
+input,select,textarea{padding:10px;border:1px solid #ccd3dd;border-radius:6px;margin:5px;max-width:100%}
+input,select{min-height:38px}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th{background:#713bd1;color:white;text-align:left}
+th,td{padding:12px 9px;border-bottom:1px solid #e1e6ed}
+.status{padding:6px 10px;border-radius:18px;background:#d8f8e7;color:#07834d}
+.absent{background:#ffe0e5;color:#c52640}
+.progress{background:#e5eaf0;height:12px;border-radius:10px;overflow:hidden}
+#progressBar{height:100%;background:#10a66a;width:0}
+.page{display:none}
+.page.active{display:block}
+.form-box{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.notice{padding:12px;background:#f5f0ff;border-radius:8px;margin:10px 0}
+@media(max-width:950px){.sidebar{width:190px}.sidebar a{font-size:14px}main{margin-left:190px;padding:14px}.cards{grid-template-columns:repeat(2,1fr)}.content-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.sidebar{position:static;width:100%;min-height:auto}.sidebar a{display:inline-block;padding:9px}main{margin:0}.cards{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+<h2>🎓 Student Portal</h2>
+<a href="#dashboard" data-page="dashboard" class="active">▦ Dashboard</a>
+<a href="student.html">♟ Add Student</a>
+<a href="students.html">👥 Student List</a>
+<a href="attendance.html">☑ Attendance</a>
+<a href="attendance-report.html">▤ Attendance Reports</a>
+<a href="#fees" data-page="fees">₹ Fee Management</a>
+<a href="#announcements" data-page="announcements">⚑ Announcements</a>
+<a href="#timetable" data-page="timetable">▦ Timetable</a>
+<a href="#library" data-page="library">▣ Library</a>
+<a href="#holidays" data-page="holidays">🏖️ Holidays</a>
+</aside>
+
+<main>
+<section class="welcome">
+<div><h2>Welcome to Student Portal 👋</h2><span>Student Attendance Management System</span></div>
+<span>🔔 Notifications | 👤 Student Admin</span>
+</section>
+
+<section id="dashboard" class="page active">
+<h1>Dashboard</h1>
+<p>Manage students and daily attendance in one place.</p>
+<div class="date-box">
+<b>Attendance Date</b>
+<input type="date" id="date">
+<button onclick="loadDashboard()">Today / Refresh</button>
+</div>
+<div class="cards">
+<div class="card"><p>Total Students</p><div class="number" id="total">0</div><span>Registered students</span></div>
+<div class="card"><p>Present Today</p><div class="number" id="present">0</div><span>Marked present</span></div>
+<div class="card"><p>Absent Today</p><div class="number" id="absent">0</div><span>Marked absent</span></div>
+<div class="card"><p>Attendance Rate</p><div class="number" id="rate">0%</div><span>Present / total students</span></div>
+</div>
+<div class="content-grid">
+<div class="panel">
+<h2>Today's Attendance</h2>
+<button onclick="location.href='attendance.html'">Mark Attendance</button>
+<div style="overflow-x:auto">
+<table><thead><tr><th>Roll No.</th><th>Name</th><th>Department</th><th>Status</th></tr></thead>
+<tbody id="studentRows"><tr><td colspan="4">Loading...</td></tr></tbody></table>
+</div>
+</div>
+<div class="panel">
+<h2 style="text-align:center">Attendance Overview</h2>
+<div class="number" id="overview" style="text-align:center;font-size:46px">0%</div>
+<p style="text-align:center">Selected date attendance</p>
+<div class="progress"><div id="progressBar"></div></div>
+<p id="notMarked">Not marked: 0</p>
+<button onclick="location.href='attendance-report.html'">View Report</button>
+</div>
+</div>
+</section>
+
+<section id="fees" class="page panel">
+<h1>₹ Fee Management</h1>
+<p>Add student fee details and track paid or pending amounts.</p>
+<form id="feeForm" class="form-box">
+<input id="feeRoll" placeholder="Roll Number" required>
+<input id="feeName" placeholder="Student Name" required>
+<input id="feeAmount" type="number" min="0" placeholder="Fee Amount ₹" required>
+<select id="feeStatus"><option>Pending</option><option>Paid</option><option>Partial</option></select>
+<button>Add Fee Record</button>
+</form>
+<div id="feeSummary" class="notice">No fee records yet.</div>
+<table><thead><tr><th>Roll No.</th><th>Name</th><th>Amount ₹</th><th>Status</th><th>Action</th></tr></thead><tbody id="feeRows"></tbody></table>
+</section>
+
+<section id="announcements" class="page panel">
+<h1>⚑ Announcements</h1>
+<p>Create and view college announcements.</p>
+<form id="announcementForm" class="form-box">
+<input id="announcementTitle" placeholder="Announcement title" required>
+<input id="announcementDate" type="date" required>
+<textarea id="announcementText" placeholder="Announcement details" required></textarea>
+<button>Publish Announcement</button>
+</form>
+<div id="announcementList"></div>
+</section>
+
+<section id="timetable" class="page panel">
+<h1>▦ Timetable</h1>
+<p>Add your class schedule.</p>
+<form id="timetableForm" class="form-box">
+<select id="classDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option></select>
+<input id="classTime" placeholder="Time (e.g. 9:00 AM)" required>
+<input id="classSubject" placeholder="Subject" required>
+<input id="classRoom" placeholder="Room / Faculty">
+<button>Add Class</button>
+</form>
+<table><thead><tr><th>Day</th><th>Time</th><th>Subject</th><th>Room / Faculty</th><th>Action</th></tr></thead><tbody id="timetableRows"></tbody></table>
+</section>
+
+<section id="library" class="page panel">
+<h1>▣ Library</h1>
+<p>Maintain a simple book register.</p>
+<form id="bookForm" class="form-box">
+<input id="bookTitle" placeholder="Book title" required>
+<input id="bookAuthor" placeholder="Author">
+<input id="bookNumber" placeholder="Book ID" required>
+<select id="bookStatus"><option>Available</option><option>Issued</option></select>
+<button>Add Book</button>
+</form>
+<table><thead><tr><th>Book ID</th><th>Title</th><th>Author</th><th>Status</th><th>Action</th></tr></thead><tbody id="bookRows"></tbody></table>
+</section>
+
+<section id="holidays" class="page panel">
+<h1>🏖️ Holidays</h1>
+<p>Add college holidays and view upcoming holidays.</p>
+<form id="holidayForm" class="form-box">
+<input id="holidayName" placeholder="Holiday name" required>
+<input id="holidayDate" type="date" required>
+<input id="holidayReason" placeholder="Reason / Description">
+<button>Add Holiday</button>
+</form>
+<table><thead><tr><th>Holiday</th><th>Date</th><th>Description</th><th>Action</th></tr></thead><tbody id="holidayRows"></tbody></table>
+</section>
+
+<footer style="text-align:center;color:#718096;padding:20px">Student Attendance Management System · Demo Project</footer>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const today = new Date();
+const localDate = d => {
+ const offset = d.getTimezoneOffset();
+ return new Date(d.getTime() - offset*60000).toISOString().slice(0,10);
+};
+$("date").value = localDate(today);
+$("announcementDate").value = localDate(today);
+
+function getData(key){try{return JSON.parse(localStorage.getItem("portal_"+key)||"[]")}catch{return []}}
+function putData(key,data){localStorage.setItem("portal_"+key,JSON.stringify(data))}
+function safe(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+document.querySelectorAll("[data-page]").forEach(link=>{
+ link.addEventListener("click",e=>{
+  e.preventDefault();
+  const page=link.dataset.page;
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  $(page).classList.add("active");
+  document.querySelectorAll("[data-page]").forEach(a=>a.classList.toggle("active",a===link));
+  location.hash=page;
+  if(page==="dashboard")loadDashboard();
+  if(page==="fees")renderFees();
+  if(page==="announcements")renderAnnouncements();
+  if(page==="timetable")renderTimetable();
+  if(page==="library")renderBooks();
+  if(page==="holidays")renderHolidays();
+ });
+});
+
+function removeItem(key,index,render){const data=getData(key);data.splice(index,1);putData(key,data);render()}
+
+$("feeForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const data=getData("fees");
+ data.push({roll:$("feeRoll").value.trim(),name:$("feeName").value.trim(),amount:Number($("feeAmount").value),status:$("feeStatus").value});
+ putData("fees",data);e.target.reset();renderFees();
+});
+function renderFees(){
+ const data=getData("fees");
+ $("feeRows").innerHTML=data.map((x,i)=>`<tr><td>${safe(x.roll)}</td><td>${safe(x.name)}</td><td>${safe(x.amount)}</td><td>${safe(x.status)}</td><td><button onclick="removeItem('fees',${i},renderFees)">Delete</button></td></tr>`).join("");
+ const total=data.reduce((s,x)=>s+Number(x.amount||0),0);
+ const paid=data.filter(x=>x.status==="Paid").reduce((s,x)=>s+Number(x.amount||0),0);
+ $("feeSummary").textContent=`Records: ${data.length} | Total fees: ₹${total} | Paid: ₹${paid} | Remaining: ₹${total-paid}`;
+}
+
+$("announcementForm").addEventListener("submit",e=>{
+ e.preventDefault();const data=getData("announcements");
+ data.unshift({title:$("announcementTitle").value.trim(),date:$("announcementDate").value,text:$("announcementText").value.trim()});
+ putData("announcements",data);e.target.reset();$("announcementDate").value=localDate(new Date());renderAnnouncements();
+});
+function renderAnnouncements(){
+ const data=getData("announcements");
+ $("announcementList").innerHTML=data.map((x,i)=>`<article class="notice"><h3>${safe(x.title)}</h3><small>${safe(x.date)}</small><p>${safe(x.text)}</p><button onclick="removeItem('announcements',${i},renderAnnouncements)">Delete</button></article>`).join("")||"<p>No announcements yet.</p>";
+}
+
+$("timetableForm").addEventListener("submit",e=>{
+ e.preventDefault();const data=getData("timetable");
+ data.push({day:$("classDay").value,time:$("classTime").value.trim(),subject:$("classSubject").value.trim(),room:$("classRoom").value.trim()});
+ putData("timetable",data);e.target.reset();renderTimetable();
+});
+function renderTimetable(){
+ const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+ const data=getData("timetable").sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day));
+ $("timetableRows").innerHTML=data.map((x)=>`<tr><td>${safe(x.day)}</td><td>${safe(x.time)}</td><td>${safe(x.subject)}</td><td>${safe(x.room)}</td><td><button onclick="deleteTimetable('${encodeURIComponent(JSON.stringify(x))}')">Delete</button></td></tr>`).join("")||'<tr><td colspan="5">No classes added.</td></tr>';
+}
+function deleteTimetable(encoded){
+ const target=JSON.parse(decodeURIComponent(encoded)),data=getData("timetable");
+ const index=data.findIndex(x=>x.day===target.day&&x.time===target.time&&x.subject===target.subject&&x.room===target.room);
+ if(index>=0)data.splice(index,1);putData("timetable",data);renderTimetable();
+}
+
+$("bookForm").addEventListener("submit",e=>{
+ e.preventDefault();const data=getData("books");
+ data.push({id:$("bookNumber").value.trim(),title:$("bookTitle").value.trim(),author:$("bookAuthor").value.trim(),status:$("bookStatus").value});
+ putData("books",data);e.target.reset();renderBooks();
+});
+function renderBooks(){
+ const data=getData("books");
+ $("bookRows").innerHTML=data.map((x,i)=>`<tr><td>${safe(x.id)}</td><td>${safe(x.title)}</td><td>${safe(x.author)}</td><td>${safe(x.status)}</td><td><button onclick="toggleBook(${i})">${x.status==="Issued"?"Mark Available":"Issue Book"}</button><button onclick="removeItem('books',${i},renderBooks)">Delete</button></td></tr>`).join("")||'<tr><td colspan="5">No books added.</td></tr>';
+}
+function toggleBook(i){const data=getData("books");data[i].status=data[i].status==="Issued"?"Available":"Issued";putData("books",data);renderBooks()}
+
+$("holidayForm").addEventListener("submit",e=>{
+ e.preventDefault();const data=getData("holidays");
+ data.push({name:$("holidayName").value.trim(),date:$("holidayDate").value,reason:$("holidayReason").value.trim()});
+ data.sort((a,b)=>a.date.localeCompare(b.date));putData("holidays",data);e.target.reset();renderHolidays();
+});
+function renderHolidays(){
+ const data=getData("holidays");
+ $("holidayRows").innerHTML=data.map((x,i)=>`<tr><td>${safe(x.name)}</td><td>${safe(x.date)}</td><td>${safe(x.reason)}</td><td><button onclick="removeItem('holidays',${i},renderHolidays)">Delete</button></td></tr>`).join("")||'<tr><td colspan="4">No holidays added.</td></tr>';
+}
+
+async function loadDashboard(){
+ try{
+  const [sr,ar]=await Promise.all([fetch("/api/students"),fetch("/api/attendance?date="+$("date").value)]);
+  if(!sr.ok)throw Error("Students API error");
+  const students=await sr.json();
+  const attendance=ar.ok?await ar.json():[];
+  const records=Array.isArray(attendance)?attendance:[];
+  const present=new Set(records.filter(a=>a.status==="Present").map(a=>Number(a.studentId??a.student_id)));
+  const absent=new Set(records.filter(a=>a.status==="Absent").map(a=>Number(a.studentId??a.student_id)));
+  $("total").textContent=students.length;
+  $("present").textContent=present.size;
+  $("absent").textContent=absent.size;
+  const rate=students.length?Math.round(present.size/students.length*100):0;
+  $("rate").textContent=rate+"%";$("overview").textContent=rate+"%";$("progressBar").style.width=rate+"%";
+  $("notMarked").textContent="Not marked: "+Math.max(0,students.length-present.size-absent.size);
+  $("studentRows").innerHTML=students.map(s=>{
+   const id=Number(s.id),status=present.has(id)?"Present":absent.has(id)?"Absent":"Not marked";
+   return `<tr><td>${safe(s.rollNumber)}</td><td>${safe(s.name)}</td><td>${safe(s.department??s.branch)}</td><td><span class="status ${status==="Absent"?"absent":""}">${status}</span></td></tr>`;
+  }).join("")||'<tr><td colspan="4">No students found.</td></tr>';
+ }catch(error){
+  $("studentRows").innerHTML='<tr><td colspan="4">Could not load students. Please check the Java backend.</td></tr>';
+ }
+}
+$("date").addEventListener("change",loadDashboard);
+
+function openInitialPage(){
+ const page=location.hash.slice(1);
+ if($(page)&&$(page).classList.contains("page")){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  $(page).classList.add("active");
+  document.querySelectorAll("[data-page]").forEach(a=>a.classList.toggle("active",a.dataset.page===page));
+ }
+}
+openInitialPage();
+loadDashboard();
+renderFees();renderAnnouncements();renderTimetable();renderBooks();renderHolidays();
+</script>
+</body>
+</html>
