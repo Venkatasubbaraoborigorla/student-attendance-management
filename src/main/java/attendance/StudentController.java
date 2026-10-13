@@ -91,10 +91,11 @@ public class StudentController {
             }
 
             return ResponseEntity.ok(students);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Could not retrieve students"));
-        }
+} catch (Exception e) {
+    e.printStackTrace();
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(Map.of("error", e.getMessage() == null
+            ? "Unknown database error" : e.getMessage()));
+}
     }
 }
