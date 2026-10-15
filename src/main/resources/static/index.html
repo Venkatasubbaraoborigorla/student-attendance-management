@@ -6,9 +6,7 @@
 <title>Student Attendance Management System</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 :root {
     --primary: #2563eb;
@@ -83,26 +81,17 @@ main {
     font-size: 26px;
 }
 
-.welcome span {
-    color: #475569;
-}
+.welcome span { color: #475569; }
 
 h1 {
     font-size: 28px;
     margin-bottom: 8px;
 }
 
-h2 {
-    font-size: 20px;
-}
+h2 { font-size: 20px; }
+p { color: var(--muted); }
 
-p {
-    color: var(--muted);
-}
-
-.date-box,
-.panel,
-.card {
+.date-box, .panel, .card {
     background: white;
     border: 1px solid #e5eaf3;
     border-radius: 16px;
@@ -130,17 +119,9 @@ p {
     box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
 }
 
-.card:nth-child(2) {
-    border-top-color: #10b981;
-}
-
-.card:nth-child(3) {
-    border-top-color: #ef4444;
-}
-
-.card:nth-child(4) {
-    border-top-color: #8b5cf6;
-}
+.card:nth-child(2) { border-top-color: #10b981; }
+.card:nth-child(3) { border-top-color: #ef4444; }
+.card:nth-child(4) { border-top-color: #8b5cf6; }
 
 .card p {
     font-size: 14px;
@@ -154,17 +135,9 @@ p {
     margin: 10px 0;
 }
 
-.card:nth-child(2) .number {
-    color: #059669;
-}
-
-.card:nth-child(3) .number {
-    color: #dc2626;
-}
-
-.card:nth-child(4) .number {
-    color: #7c3aed;
-}
+.card:nth-child(2) .number { color: #059669; }
+.card:nth-child(3) .number { color: #dc2626; }
+.card:nth-child(4) .number { color: #7c3aed; }
 
 .content-grid {
     display: grid;
@@ -185,13 +158,9 @@ button {
     transition: 0.2s;
 }
 
-button:hover {
-    background: #1d4ed8;
-}
+button:hover { background: #1d4ed8; }
 
-input,
-select,
-textarea {
+input, select, textarea {
     padding: 11px 12px;
     border: 1px solid #cbd5e1;
     border-radius: 9px;
@@ -201,14 +170,9 @@ textarea {
     background: white;
 }
 
-input,
-select {
-    min-height: 42px;
-}
+input, select { min-height: 42px; }
 
-input:focus,
-select:focus,
-textarea:focus {
+input:focus, select:focus, textarea:focus {
     outline: 2px solid #bfdbfe;
     border-color: #3b82f6;
 }
@@ -232,16 +196,13 @@ th {
     font-size: 13px;
 }
 
-th,
-td {
+th, td {
     padding: 14px 12px;
     border-bottom: 1px solid #e5eaf3;
     font-size: 14px;
 }
 
-tbody tr:hover {
-    background: #f8fafc;
-}
+tbody tr:hover { background: #f8fafc; }
 
 .status {
     display: inline-block;
@@ -279,13 +240,8 @@ tbody tr:hover {
     transition: width 0.4s;
 }
 
-.page {
-    display: none;
-}
-
-.page.active {
-    display: block;
-}
+.page { display: none; }
+.page.active { display: block; }
 
 .form-box {
     display: flex;
@@ -309,18 +265,41 @@ footer {
     font-size: 13px;
 }
 
+/* Dashboard quick action buttons */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 18px 0 24px;
+}
+
+.quick-action {
+    display: block;
+    padding: 14px 16px;
+    background: #142D4E;
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: background .2s, transform .2s;
+}
+
+.quick-action:hover {
+    background: #3478C7;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
 @media (max-width: 1100px) {
-    main {
-        padding: 20px;
-    }
+    main { padding: 20px; }
 
     .cards {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .content-grid {
-        grid-template-columns: 1fr;
-    }
+    .content-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 700px) {
@@ -331,9 +310,7 @@ footer {
         padding: 14px;
     }
 
-    .sidebar h2 {
-        margin: 5px 5px 15px;
-    }
+    .sidebar h2 { margin: 5px 5px 15px; }
 
     .sidebar a {
         display: inline-block;
@@ -347,38 +324,23 @@ footer {
         padding: 14px;
     }
 
-    .welcome {
-        padding: 20px;
-    }
-
-    .welcome h2 {
-        font-size: 22px;
-    }
+    .welcome { padding: 20px; }
+    .welcome h2 { font-size: 22px; }
 
     .cards {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
     }
 
-    .card,
-    .panel,
-    .date-box {
-        padding: 15px;
-    }
+    .card, .panel, .date-box { padding: 15px; }
+    .number { font-size: 27px; }
+    table { min-width: 550px; }
 
-    .number {
-        font-size: 27px;
-    }
-
-    table {
-        min-width: 550px;
-    }
+    .quick-actions { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 380px) {
-    .cards {
-        grid-template-columns: 1fr;
-    }
+    .cards { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -414,6 +376,15 @@ footer {
 <section id="dashboard" class="page active">
     <h1>Dashboard</h1>
     <p>Manage students and daily attendance in one place.</p>
+
+    <div class="quick-actions" aria-label="Quick actions">
+        <a href="attendance.html" class="quick-action">📅 Mark Attendance</a>
+        <a href="student.html" class="quick-action">➕ Add Student</a>
+        <a href="attendance-report.html" class="quick-action">📊 View Attendance Report</a>
+        <a href="/api/attendance/report/pdf" class="quick-action" target="_blank" rel="noopener">📄 Download All Students PDF</a>
+        <a href="student-report.html" class="quick-action">👤 Student-wise Report</a>
+        <a href="students.html" class="quick-action">👥 View Student List</a>
+    </div>
 
     <div class="date-box">
         <b>📅 Attendance Date</b>
@@ -522,7 +493,7 @@ footer {
         <input id="announcementTitle" placeholder="Announcement title" required>
         <input id="announcementDate" type="date" required>
         <textarea id="announcementText" placeholder="Announcement details" required></textarea>
-        <button>Publish Announcement</button>
+        <button>Add Announcement</button>
     </form>
 
     <div id="announcementList"></div>
@@ -530,24 +501,28 @@ footer {
 
 <section id="timetable" class="page panel">
     <h1>▦ Timetable</h1>
-    <p>Add your class schedule.</p>
+    <p>Add and manage your class timetable.</p>
 
     <form id="timetableForm" class="form-box">
-        <select id="classDay">
-            <option>Monday</option><option>Tuesday</option>
-            <option>Wednesday</option><option>Thursday</option>
-            <option>Friday</option><option>Saturday</option>
+        <select id="classDay" required>
+            <option value="">Select Day</option>
+            <option>Monday</option>
+            <option>Tuesday</option>
+            <option>Wednesday</option>
+            <option>Thursday</option>
+            <option>Friday</option>
+            <option>Saturday</option>
         </select>
-        <input id="classTime" placeholder="Time (e.g. 9:00 AM)" required>
+        <input id="classTime" placeholder="Time (e.g. 10:00 AM)" required>
         <input id="classSubject" placeholder="Subject" required>
-        <input id="classRoom" placeholder="Room / Faculty">
+        <input id="classRoom" placeholder="Room" required>
         <button>Add Class</button>
     </form>
 
     <div class="table-wrap">
         <table>
             <thead>
-                <tr><th>Day</th><th>Time</th><th>Subject</th><th>Room / Faculty</th><th>Action</th></tr>
+                <tr><th>Day</th><th>Time</th><th>Subject</th><th>Room</th><th>Action</th></tr>
             </thead>
             <tbody id="timetableRows"></tbody>
         </table>
@@ -556,13 +531,16 @@ footer {
 
 <section id="library" class="page panel">
     <h1>▣ Library</h1>
-    <p>Maintain a simple book register.</p>
+    <p>Add books and manage whether a book is available or issued.</p>
 
     <form id="bookForm" class="form-box">
-        <input id="bookTitle" placeholder="Book title" required>
-        <input id="bookAuthor" placeholder="Author">
         <input id="bookNumber" placeholder="Book ID" required>
-        <select id="bookStatus"><option>Available</option><option>Issued</option></select>
+        <input id="bookTitle" placeholder="Book Title" required>
+        <input id="bookAuthor" placeholder="Author" required>
+        <select id="bookStatus">
+            <option>Available</option>
+            <option>Issued</option>
+        </select>
         <button>Add Book</button>
     </form>
 
@@ -849,7 +827,9 @@ async function loadDashboard() {
         $("present").textContent = present.size;
         $("absent").textContent = absent.size;
 
-        const rate = students.length ? Math.round(present.size / students.length * 100) : 0;
+        const rate = students.length
+            ? Math.round(present.size / students.length * 100)
+            : 0;
 
         $("rate").textContent = rate + "%";
         $("overview").textContent = rate + "%";
@@ -860,10 +840,13 @@ async function loadDashboard() {
 
         $("studentRows").innerHTML = students.map(s => {
             const id = Number(s.id);
-            const status = present.has(id) ? "Present" : absent.has(id) ? "Absent" : "Not marked";
+            const status = present.has(id)
+                ? "Present"
+                : absent.has(id) ? "Absent" : "Not marked";
 
-            const statusClass = status === "Absent" ? "absent" :
-                status === "Not marked" ? "unmarked" : "";
+            const statusClass = status === "Absent"
+                ? "absent"
+                : status === "Not marked" ? "unmarked" : "";
 
             return `<tr>
                 <td>${safe(s.rollNumber)}</td>
