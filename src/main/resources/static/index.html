@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Attendance Management System</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #2563eb;
+    --navy: #14213d;
+    --background: #f4f7fc;
+    --text: #1e293b;
+    --muted: #64748b;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--background);
+    color: var(--text);
+}
+
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #172554, #0f172a);
+    color: white;
+    position: fixed;
+    inset: 0 auto 0 0;
+    padding: 24px 14px;
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    font-size: 21px;
+    margin: 8px 5px 28px;
+}
+
+.sidebar a {
+    display: block;
+    color: #dbeafe;
+    text-decoration: none;
+    padding: 13px;
+    margin: 6px 0;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background: #2563eb;
+    color: white;
+}
+
+main {
+    margin-left: 250px;
+    padding: 28px;
+    min-height: 100vh;
+}
+
+.welcome {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 28px;
+    margin-bottom: 25px;
+    border-radius: 18px;
+    background: linear-gradient(120deg, #dbeafe, #eff6ff, #e0e7ff);
+    border: 1px solid #dbeafe;
+}
+
+.welcome h2 {
+    margin: 0 0 8px;
+    color: #1e3a8a;
+    font-size: 26px;
+}
+
+.welcome span {
+    color: #475569;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+h2 {
+    font-size: 20px;
+}
+
+p {
+    color: var(--muted);
+}
+
+.date-box,
+.panel,
+.card {
+    background: white;
+    border: 1px solid #e5eaf3;
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 22px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.card {
+    margin-bottom: 0;
+    border: none;
+    border-top: 4px solid #3b82f6;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
+}
+
+.card:nth-child(2) {
+    border-top-color: #10b981;
+}
+
+.card:nth-child(3) {
+    border-top-color: #ef4444;
+}
+
+.card:nth-child(4) {
+    border-top-color: #8b5cf6;
+}
+
+.card p {
+    font-size: 14px;
+    margin: 0;
+}
+
+.number {
+    font-size: 32px;
+    font-weight: 750;
+    color: #2563eb;
+    margin: 10px 0;
+}
+
+.card:nth-child(2) .number {
+    color: #059669;
+}
+
+.card:nth-child(3) .number {
+    color: #dc2626;
+}
+
+.card:nth-child(4) .number {
+    color: #7c3aed;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr);
+    gap: 20px;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 11px 17px;
+    border-radius: 9px;
+    cursor: pointer;
+    margin: 4px 3px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+input,
+select,
+textarea {
+    padding: 11px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    margin: 5px;
+    max-width: 100%;
+    font: inherit;
+    background: white;
+}
+
+input,
+select {
+    min-height: 42px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid #bfdbfe;
+    border-color: #3b82f6;
+}
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: white;
+}
+
+th {
+    background: #eff6ff;
+    color: #1e40af;
+    text-align: left;
+    font-size: 13px;
+}
+
+th,
+td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #e5eaf3;
+    font-size: 14px;
+}
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+.status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.status.absent {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.status.unmarked {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.progress {
+    background: #e2e8f0;
+    height: 12px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+#progressBar {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    width: 0;
+    border-radius: 20px;
+    transition: width 0.4s;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.form-box {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.notice {
+    padding: 15px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    margin: 12px 0;
+}
+
+footer {
+    text-align: center;
+    color: #718096;
+    padding: 20px;
+    font-size: 13px;
+}
+
+@media (max-width: 1100px) {
+    main {
+        padding: 20px;
+    }
+
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        min-height: auto;
+        padding: 14px;
+    }
+
+    .sidebar h2 {
+        margin: 5px 5px 15px;
+    }
+
+    .sidebar a {
+        display: inline-block;
+        padding: 10px;
+        margin: 3px;
+        font-size: 13px;
+    }
+
+    main {
+        margin-left: 0;
+        padding: 14px;
+    }
+
+    .welcome {
+        padding: 20px;
+    }
+
+    .welcome h2 {
+        font-size: 22px;
+    }
+
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .card,
+    .panel,
+    .date-box {
+        padding: 15px;
+    }
+
+    .number {
+        font-size: 27px;
+    }
+
+    table {
+        min-width: 550px;
+    }
+}
+
+@media (max-width: 380px) {
+    .cards {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <h2>🎓 Student Portal</h2>
+
+    <a href="#dashboard" data-page="dashboard" class="active">▦ Dashboard</a>
+    <a href="student.html">♟ Add Student</a>
+    <a href="students.html">👥 Student List</a>
+    <a href="attendance.html">☑ Attendance</a>
+    <a href="attendance-report.html">▤ Attendance Reports</a>
+    <a href="student-report.html">📊 Student-wise Attendance Report</a>
+    <a href="#fees" data-page="fees">₹ Fee Management</a>
+    <a href="#announcements" data-page="announcements">⚑ Announcements</a>
+    <a href="#timetable" data-page="timetable">▦ Timetable</a>
+    <a href="#library" data-page="library">▣ Library</a>
+    <a href="#holidays" data-page="holidays">🏖️ Holidays</a>
+</aside>
+
+<main>
+
+<section class="welcome">
+    <div>
+        <h2>Welcome to Student Portal 👋</h2>
+        <span>Student Attendance Management System</span>
+    </div>
+    <span>🔔 Notifications | 👤 Student Admin</span>
+</section>
+
+<section id="dashboard" class="page active">
+    <h1>Dashboard</h1>
+    <p>Manage students and daily attendance in one place.</p>
+
+    <div class="date-box">
+        <b>📅 Attendance Date</b>
+        <input type="date" id="date">
+        <button onclick="loadDashboard()">↻ Today / Refresh</button>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <p>👥 Total Students</p>
+            <div class="number" id="total">0</div>
+            <span>Registered students</span>
+        </div>
+
+        <div class="card">
+            <p>✅ Present Today</p>
+            <div class="number" id="present">0</div>
+            <span>Marked present</span>
+        </div>
+
+        <div class="card">
+            <p>❌ Absent Today</p>
+            <div class="number" id="absent">0</div>
+            <span>Marked absent</span>
+        </div>
+
+        <div class="card">
+            <p>📊 Attendance Rate</p>
+            <div class="number" id="rate">0%</div>
+            <span>Present / total students</span>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="panel">
+            <h2>Today's Attendance</h2>
+            <button onclick="location.href='attendance.html'">+ Mark Attendance</button>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Roll No.</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentRows">
+                        <tr><td colspan="4">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2 style="text-align:center">Attendance Overview</h2>
+            <div class="number" id="overview"
+                 style="text-align:center;font-size:46px">0%</div>
+            <p style="text-align:center">Selected date attendance</p>
+
+            <div class="progress">
+                <div id="progressBar"></div>
+            </div>
+
+            <p id="notMarked">Not marked: 0</p>
+            <button onclick="location.href='attendance-report.html'">View Report</button>
+            <button onclick="location.href='/api/attendance/report/pdf'">Download PDF</button>
+        </div>
+    </div>
+</section>
+
+<section id="fees" class="page panel">
+    <h1>₹ Fee Management</h1>
+    <p>Add student fee details and track paid or pending amounts.</p>
+
+    <form id="feeForm" class="form-box">
+        <input id="feeRoll" placeholder="Roll Number" required>
+        <input id="feeName" placeholder="Student Name" required>
+        <input id="feeAmount" type="number" min="0" placeholder="Fee Amount ₹" required>
+        <select id="feeStatus">
+            <option>Pending</option>
+            <option>Paid</option>
+            <option>Partial</option>
+        </select>
+        <button>Add Fee Record</button>
+    </form>
+
+    <div id="feeSummary" class="notice">No fee records yet.</div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Roll No.</th><th>Name</th><th>Amount ₹</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody id="feeRows"></tbody>
+        </table>
+    </div>
+</section>
+
+<section id="announcements" class="page panel">
+    <h1>⚑ Announcements</h1>
+    <p>Create and view college announcements.</p>
+
+    <form id="announcementForm" class="form-box">
+        <input id="announcementTitle" placeholder="Announcement title" required>
+        <input id="announcementDate" type="date" required>
+        <textarea id="announcementText" placeholder="Announcement details" required></textarea>
+        <button>Publish Announcement</button>
+    </form>
+
+    <div id="announcementList"></div>
+</section>
+
+<section id="timetable" class="page panel">
+    <h1>▦ Timetable</h1>
+    <p>Add your class schedule.</p>
+
+    <form id="timetableForm" class="form-box">
+        <select id="classDay">
+            <option>Monday</option><option>Tuesday</option>
+            <option>Wednesday</option><option>Thursday</option>
+            <option>Friday</option><option>Saturday</option>
+        </select>
+        <input id="classTime" placeholder="Time (e.g. 9:00 AM)" required>
+        <input id="classSubject" placeholder="Subject" required>
+        <input id="classRoom" placeholder="Room / Faculty">
+        <button>Add Class</button>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Day</th><th>Time</th><th>Subject</th><th>Room / Faculty</th><th>Action</th></tr>
+            </thead>
+            <tbody id="timetableRows"></tbody>
+        </table>
+    </div>
+</section>
+
+<section id="library" class="page panel">
+    <h1>▣ Library</h1>
+    <p>Maintain a simple book register.</p>
+
+    <form id="bookForm" class="form-box">
+        <input id="bookTitle" placeholder="Book title" required>
+        <input id="bookAuthor" placeholder="Author">
+        <input id="bookNumber" placeholder="Book ID" required>
+        <select id="bookStatus"><option>Available</option><option>Issued</option></select>
+        <button>Add Book</button>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Book ID</th><th>Title</th><th>Author</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody id="bookRows"></tbody>
+        </table>
+    </div>
+</section>
+
+<section id="holidays" class="page panel">
+    <h1>🏖️ Holidays</h1>
+    <p>Add college holidays and view upcoming holidays.</p>
+
+    <form id="holidayForm" class="form-box">
+        <input id="holidayName" placeholder="Holiday name" required>
+        <input id="holidayDate" type="date" required>
+        <input id="holidayReason" placeholder="Reason / Description">
+        <button>Add Holiday</button>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Holiday</th><th>Date</th><th>Description</th><th>Action</th></tr>
+            </thead>
+            <tbody id="holidayRows"></tbody>
+        </table>
+    </div>
+</section>
+
+<footer>Student Attendance Management System · Demo Project</footer>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const today = new Date();
+
+const localDate = d => {
+    const offset = d.getTimezoneOffset();
+    return new Date(d.getTime() - offset * 60000).toISOString().slice(0, 10);
+};
+
+$("date").value = localDate(today);
+$("announcementDate").value = localDate(today);
+
+function getData(key) {
+    try {
+        return JSON.parse(localStorage.getItem("portal_" + key) || "[]");
+    } catch {
+        return [];
+    }
+}
+
+function putData(key, data) {
+    localStorage.setItem("portal_" + key, JSON.stringify(data));
+}
+
+function safe(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;",
+        '"': "&quot;", "'": "&#39;"
+    }[c]));
+}
+
+document.querySelectorAll("[data-page]").forEach(link => {
+    link.addEventListener("click", e => {
+        e.preventDefault();
+        const page = link.dataset.page;
+
+        document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+        $(page).classList.add("active");
+
+        document.querySelectorAll("[data-page]").forEach(a =>
+            a.classList.toggle("active", a === link)
+        );
+
+        location.hash = page;
+
+        if (page === "dashboard") loadDashboard();
+        if (page === "fees") renderFees();
+        if (page === "announcements") renderAnnouncements();
+        if (page === "timetable") renderTimetable();
+        if (page === "library") renderBooks();
+        if (page === "holidays") renderHolidays();
+    });
+});
+
+function removeItem(key, index, render) {
+    const data = getData(key);
+    data.splice(index, 1);
+    putData(key, data);
+    render();
+}
+
+$("feeForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const data = getData("fees");
+
+    data.push({
+        roll: $("feeRoll").value.trim(),
+        name: $("feeName").value.trim(),
+        amount: Number($("feeAmount").value),
+        status: $("feeStatus").value
+    });
+
+    putData("fees", data);
+    e.target.reset();
+    renderFees();
+});
+
+function renderFees() {
+    const data = getData("fees");
+
+    $("feeRows").innerHTML = data.map((x, i) =>
+        `<tr>
+            <td>${safe(x.roll)}</td>
+            <td>${safe(x.name)}</td>
+            <td>${safe(x.amount)}</td>
+            <td>${safe(x.status)}</td>
+            <td><button onclick="removeItem('fees',${i},renderFees)">Delete</button></td>
+        </tr>`
+    ).join("");
+
+    const total = data.reduce((s, x) => s + Number(x.amount || 0), 0);
+    const paid = data.filter(x => x.status === "Paid")
+        .reduce((s, x) => s + Number(x.amount || 0), 0);
+
+    $("feeSummary").textContent =
+        `Records: ${data.length} | Total fees: ₹${total} | Paid: ₹${paid} | Remaining: ₹${total - paid}`;
+}
+
+$("announcementForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const data = getData("announcements");
+
+    data.unshift({
+        title: $("announcementTitle").value.trim(),
+        date: $("announcementDate").value,
+        text: $("announcementText").value.trim()
+    });
+
+    putData("announcements", data);
+    e.target.reset();
+    $("announcementDate").value = localDate(new Date());
+    renderAnnouncements();
+});
+
+function renderAnnouncements() {
+    const data = getData("announcements");
+
+    $("announcementList").innerHTML = data.map((x, i) =>
+        `<article class="notice">
+            <h3>${safe(x.title)}</h3>
+            <small>${safe(x.date)}</small>
+            <p>${safe(x.text)}</p>
+            <button onclick="removeItem('announcements',${i},renderAnnouncements)">Delete</button>
+        </article>`
+    ).join("") || "<p>No announcements yet.</p>";
+}
+
+$("timetableForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const data = getData("timetable");
+
+    data.push({
+        day: $("classDay").value,
+        time: $("classTime").value.trim(),
+        subject: $("classSubject").value.trim(),
+        room: $("classRoom").value.trim()
+    });
+
+    putData("timetable", data);
+    e.target.reset();
+    renderTimetable();
+});
+
+function renderTimetable() {
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const data = getData("timetable").sort((a, b) => days.indexOf(a.day) - days.indexOf(b.day));
+
+    $("timetableRows").innerHTML = data.map((x, i) =>
+        `<tr>
+            <td>${safe(x.day)}</td><td>${safe(x.time)}</td>
+            <td>${safe(x.subject)}</td><td>${safe(x.room)}</td>
+            <td><button onclick="removeItem('timetable',${i},renderTimetable)">Delete</button></td>
+        </tr>`
+    ).join("") || '<tr><td colspan="5">No classes added.</td></tr>';
+}
+
+$("bookForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const data = getData("books");
+
+    data.push({
+        id: $("bookNumber").value.trim(),
+        title: $("bookTitle").value.trim(),
+        author: $("bookAuthor").value.trim(),
+        status: $("bookStatus").value
+    });
+
+    putData("books", data);
+    e.target.reset();
+    renderBooks();
+});
+
+function renderBooks() {
+    const data = getData("books");
+
+    $("bookRows").innerHTML = data.map((x, i) =>
+        `<tr>
+            <td>${safe(x.id)}</td><td>${safe(x.title)}</td>
+            <td>${safe(x.author)}</td><td>${safe(x.status)}</td>
+            <td>
+                <button onclick="toggleBook(${i})">${x.status === "Issued" ? "Mark Available" : "Issue Book"}</button>
+                <button onclick="removeItem('books',${i},renderBooks)">Delete</button>
+            </td>
+        </tr>`
+    ).join("") || '<tr><td colspan="5">No books added.</td></tr>';
+}
+
+function toggleBook(i) {
+    const data = getData("books");
+    data[i].status = data[i].status === "Issued" ? "Available" : "Issued";
+    putData("books", data);
+    renderBooks();
+}
+
+$("holidayForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const data = getData("holidays");
+
+    data.push({
+        name: $("holidayName").value.trim(),
+        date: $("holidayDate").value,
+        reason: $("holidayReason").value.trim()
+    });
+
+    data.sort((a, b) => a.date.localeCompare(b.date));
+    putData("holidays", data);
+    e.target.reset();
+    renderHolidays();
+});
+
+function renderHolidays() {
+    const data = getData("holidays");
+
+    $("holidayRows").innerHTML = data.map((x, i) =>
+        `<tr>
+            <td>${safe(x.name)}</td><td>${safe(x.date)}</td>
+            <td>${safe(x.reason)}</td>
+            <td><button onclick="removeItem('holidays',${i},renderHolidays)">Delete</button></td>
+        </tr>`
+    ).join("") || '<tr><td colspan="4">No holidays added.</td></tr>';
+}
+
+async function loadDashboard() {
+    try {
+        const [sr, ar] = await Promise.all([
+            fetch("/api/students"),
+            fetch("/api/attendance?date=" + $("date").value)
+        ]);
+
+        if (!sr.ok) throw Error("Students API error");
+
+        const students = await sr.json();
+        const attendance = ar.ok ? await ar.json() : [];
+        const records = Array.isArray(attendance) ? attendance : [];
+
+        const present = new Set(
+            records.filter(a => a.status === "Present")
+                .map(a => Number(a.studentId ?? a.student_id))
+        );
+
+        const absent = new Set(
+            records.filter(a => a.status === "Absent")
+                .map(a => Number(a.studentId ?? a.student_id))
+        );
+
+        $("total").textContent = students.length;
+        $("present").textContent = present.size;
+        $("absent").textContent = absent.size;
+
+        const rate = students.length ? Math.round(present.size / students.length * 100) : 0;
+
+        $("rate").textContent = rate + "%";
+        $("overview").textContent = rate + "%";
+        $("progressBar").style.width = rate + "%";
+
+        $("notMarked").textContent =
+            "Not marked: " + Math.max(0, students.length - present.size - absent.size);
+
+        $("studentRows").innerHTML = students.map(s => {
+            const id = Number(s.id);
+            const status = present.has(id) ? "Present" : absent.has(id) ? "Absent" : "Not marked";
+
+            const statusClass = status === "Absent" ? "absent" :
+                status === "Not marked" ? "unmarked" : "";
+
+            return `<tr>
+                <td>${safe(s.rollNumber)}</td>
+                <td>${safe(s.name)}</td>
+                <td>${safe(s.department ?? s.branch)}</td>
+                <td><span class="status ${statusClass}">${status}</span></td>
+            </tr>`;
+        }).join("") || '<tr><td colspan="4">No students found.</td></tr>';
+
+    } catch (error) {
+        $("studentRows").innerHTML =
+            '<tr><td colspan="4">Could not load students. Please check the Java backend.</td></tr>';
+    }
+}
+
+$("date").addEventListener("change", loadDashboard);
+
+function openInitialPage() {
+    const page = location.hash.slice(1);
+
+    if ($(page) && $(page).classList.contains("page")) {
+        document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+        $(page).classList.add("active");
+
+        document.querySelectorAll("[data-page]").forEach(a =>
+            a.classList.toggle("active", a.dataset.page === page)
+        );
+    }
+}
+
+openInitialPage();
+loadDashboard();
+renderFees();
+renderAnnouncements();
+renderTimetable();
+renderBooks();
+renderHolidays();
+</script>
+
+</body>
+</html>

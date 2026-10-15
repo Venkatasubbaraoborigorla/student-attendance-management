@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attendance Reports</title>
+<style>
+body{font-family:Arial;background:#f1f5f9;padding:25px}
+.container{max-width:950px;margin:auto;background:white;padding:25px;border-radius:12px}
+h1{color:#263c80}
+button,input{padding:10px;margin:5px;border-radius:6px;border:1px solid #ccc}
+button{background:#6d3bd1;color:white;cursor:pointer;border:0}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #ddd}
+th{background:#6d3bd1;color:white}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Attendance Reports</h1>
+
+<label>Select Date: <input type="date" id="date"></label>
+<button onclick="loadReport()">View Report</button>
+
+<p id="summary">Select a date to view attendance.</p>
+
+<table>
+<thead>
+<tr>
+<th>Roll Number</th>
+<th>Student Name</th>
+<th>Date</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+
+<p><a href="/">Back to Home</a></p>
+</div>
+
+<script>
+const dateInput = document.getElementById("date");
+const today = new Date();
+dateInput.value = [
+ today.getFullYear(),
+ String(today.getMonth()+1).padStart(2,"0"),
+ String(today.getDate()).padStart(2,"0")
+].join("-");
+
+async function loadReport(){
+ const rows = document.getElementById("rows");
+ const summary = document.getElementById("summary");
+ rows.replaceChildren();
+ summary.textContent = "Loading...";
+
+ try{
+  const response = await fetch(
+   "/api/attendance?date=" + dateInput.value
+  );
+  const data = await response.json();
+
+  if(!response.ok) throw new Error();
+
+  let present = 0;
+  let absent = 0;
+
+  data.forEach(item => {
+   if(item.status === "Present") present++;
+   else absent++;
+
+   const tr = document.createElement("tr");
+
+   [
+    item.rollNumber,
+    item.name,
+    item.date,
+    item.status
+   ].forEach(value => {
+    const td = document.createElement("td");
+    td.textContent = value ?? "-";
+    tr.appendChild(td);
+   });
+
+   rows.appendChild(tr);
+  });
+
+  summary.textContent =
+   "Records: " + data.length +
+   " | Present: " + present +
+   " | Absent: " + absent;
+
+  if(data.length === 0){
+   summary.textContent += " | No attendance records for this date.";
+  }
+ }catch(error){
+  summary.textContent = "Unable to load report. Check the server.";
+ }
+}
+
+loadReport();
+</script>
+</body>
+</html>

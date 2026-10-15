@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mark Attendance</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f4f9;
+    color: #19324e;
+}
+
+main {
+    padding: 30px;
+}
+
+.panel {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+}
+
+h1 {
+    color: #244c8b;
+}
+
+.top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+input, select, button {
+    padding: 11px 14px;
+    border-radius: 7px;
+    border: 1px solid #ccd3dd;
+    font-size: 15px;
+}
+
+button {
+    cursor: pointer;
+    color: white;
+    border: none;
+}
+
+.load {
+    background: #713bd1;
+}
+
+.present {
+    background: #119c6b;
+}
+
+.absent {
+    background: #e6324b;
+}
+
+.selected {
+    outline: 3px solid #25364a;
+    outline-offset: 2px;
+}
+
+.holiday {
+    background: #e9a323;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    background: #7542cf;
+    color: white;
+    text-align: left;
+}
+
+th, td {
+    padding: 15px;
+    border-bottom: 1px solid #dfe5ed;
+}
+
+.status {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: #eee;
+}
+
+.message {
+    margin: 18px 0;
+    font-weight: 500;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #7a8ba1;
+}
+
+@media (max-width: 650px) {
+    main {
+        padding: 10px;
+    }
+
+    .panel {
+        padding: 12px;
+    }
+
+    th, td {
+        padding: 9px;
+        font-size: 13px;
+    }
+}
+</style>
+</head>
+
+<body>
+<main>
+<div class="panel">
+
+<h1>Mark Attendance</h1>
+
+<div class="top">
+    <strong>Attendance Date:</strong>
+    <input type="date" id="date">
+
+    <button class="load" onclick="loadStudents()">
+        Load Students
+    </button>
+
+    <button class="load" id="saveButton" onclick="saveAll()">
+        Save All Attendance
+    </button>
+
+    <button class="holiday" onclick="markHoliday()">
+        Mark Holiday
+    </button>
+</div>
+
+<p id="message" class="message">
+    Select a date and mark each student Present or Absent.
+</p>
+
+<div style="overflow-x:auto">
+<table>
+<thead>
+<tr>
+    <th>Roll No.</th>
+    <th>Student Name</th>
+    <th>Course</th>
+    <th>Attendance</th>
+    <th>Status</th>
+</tr>
+</thead>
+
+<tbody id="rows">
+    <tr>
+        <td colspan="5">Loading students...</td>
+    </tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<p><a href="index.html">Back to Dashboard</a></p>
+</main>
+
+<footer>
+Student Attendance Management System · Demo Project
+</footer>
+
+<script>
+const dateBox = document.getElementById("date");
+const message = document.getElementById("message");
+
+dateBox.value = [
+    new Date().getFullYear(),
+    String(new Date().getMonth() + 1).padStart(2, "0"),
+    String(new Date().getDate()).padStart(2, "0")
+].join("-");
+
+let students = [];
+
+async function loadStudents() {
+    message.textContent = "Loading students...";
+
+    try {
+        const response = await fetch("/api/students");
+
+        if (!response.ok) {
+            throw new Error("Could not load students");
+        }
+
+        students = await response.json();
+
+        const attendanceResponse = await fetch(
+            "/api/attendance?date=" + dateBox.value
+        );
+
+        if (!attendanceResponse.ok) {
+            throw new Error("Could not load attendance");
+        }
+
+        const records = await attendanceResponse.json();
+
+        document.getElementById("rows").innerHTML =
+            students.map(student => {
+
+                const record = records.find(item =>
+                    Number(item.studentId ?? item.student_id) ===
+                    Number(student.id)
+                );
+
+                const status = record ? record.status : "";
+
+                return `
+                <tr data-id="${student.id}" data-status="${status}">
+                    <td>${student.rollNumber ?? ""}</td>
+                    <td>${student.name ?? ""}</td>
+                    <td>${student.department ?? student.branch ?? "B.Tech CSE"}</td>
+
+                    <td>
+                        <button
+                            class="present ${status === "Present" ? "selected" : ""}"
+                            onclick="choose(${student.id}, 'Present')">
+                            Present
+                        </button>
+
+                        <button
+                            class="absent ${status === "Absent" ? "selected" : ""}"
+                            onclick="choose(${student.id}, 'Absent')">
+                            Absent
+                        </button>
+                    </td>
+
+                    <td>
+                        <span class="status"
+                        style="background:${
+                            status === "Present" ? "#d8f8e7" :
+                            status === "Absent" ? "#ffe0e5" : "#eee"
+                        };color:${
+                            status === "Present" ? "#07834d" :
+                            status === "Absent" ? "#c52640" : "#19324e"
+                        }">
+                            ${status || "Not marked"}
+                        </span>
+                    </td>
+                </tr>`;
+            }).join("") ||
+            '<tr><td colspan="5">No students found.</td></tr>';
+
+        message.textContent = students.length
+            ? "Students loaded. Select Present or Absent."
+            : "No students found.";
+
+    } catch (error) {
+        console.error(error);
+        message.textContent =
+            "Students load avvaledu. Java backend and database check cheyyi.";
+    }
+}
+
+function choose(id, status) {
+    const row = document.querySelector(`tr[data-id="${id}"]`);
+
+    if (!row) return;
+
+    row.dataset.status = status;
+
+    const statusBox = row.querySelector(".status");
+    statusBox.textContent = status;
+
+    statusBox.style.background =
+        status === "Present" ? "#d8f8e7" : "#ffe0e5";
+
+    statusBox.style.color =
+        status === "Present" ? "#07834d" : "#c52640";
+
+    row.querySelector(".present").classList.toggle(
+        "selected", status === "Present"
+    );
+
+    row.querySelector(".absent").classList.toggle(
+        "selected", status === "Absent"
+    );
+}
+
+async function saveAll() {
+    const rows = [...document.querySelectorAll("#rows tr")];
+    const markedRows = rows.filter(row => row.dataset.status);
+
+    if (!markedRows.length) {
+        message.textContent =
+            "Mundhu students ki Present or Absent select cheyyi.";
+        return;
+    }
+
+    const saveButton = document.getElementById("saveButton");
+    saveButton.disabled = true;
+    message.textContent = "Saving attendance...";
+
+    try {
+        for (const row of markedRows) {
+            const payload = {
+                studentId: String(row.dataset.id),
+                date: dateBox.value,
+                status: row.dataset.status
+            };
+
+            const response = await fetch("/api/attendance", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText);
+            }
+        }
+
+        message.textContent = "Attendance saved successfully!";
+        await loadStudents();
+
+    } catch (error) {
+        console.error("Save error:", error);
+
+        message.textContent =
+            "Attendance save failed. VS Code Terminal lo error check cheyyi.";
+    } finally {
+        saveButton.disabled = false;
+    }
+}
+
+async function markHoliday() {
+    const confirmed = confirm(
+        "Ee date holiday ga mark cheyyala? Existing attendance records delete cheyyabadavu."
+    );
+
+    if (!confirmed) return;
+
+    message.textContent =
+        "Holiday option: date ni holiday ga mark cheyyadaniki backend support inka add cheyyali.";
+
+    alert(
+        "Holiday button ready. Holiday ni database lo save cheyyadaniki Java backend lo separate holiday API avasaram."
+    );
+}
+
+dateBox.addEventListener("change", loadStudents);
+
+loadStudents();
+</script>
+</body>
+</html>

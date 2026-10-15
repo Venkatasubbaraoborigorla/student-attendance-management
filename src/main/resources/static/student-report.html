@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Attendance Report</title>
+<style>
+body{font-family:Arial;background:#f1f5f9;padding:25px;color:#1e293b}
+.container{max-width:1000px;margin:auto}
+.card{background:white;padding:20px;border-radius:12px;margin:15px 0}
+.filters,.stats{display:flex;gap:15px;flex-wrap:wrap}
+.stat{flex:1;min-width:140px;background:white;padding:20px;border-radius:12px}
+label{display:block;margin:8px 0}
+input,button{padding:10px;border-radius:6px;border:1px solid #ccc}
+button{background:#6d3bd1;color:white;cursor:pointer}
+.value{font-size:25px;font-weight:bold;margin-top:8px}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #ddd}
+th{background:#6d3bd1;color:white}
+.table-wrap{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Student Attendance Report</h1>
+<p>Student-wise attendance history and statistics</p>
+
+<div class="card filters">
+<div>
+<label for="studentId">Student ID</label>
+<input id="studentId" type="number" min="1" value="1">
+</div>
+<div>
+<label for="fromDate">From Date</label>
+<input id="fromDate" type="date">
+</div>
+<div>
+<label for="toDate">To Date</label>
+<input id="toDate" type="date">
+</div>
+<div>
+<label>&nbsp;</label>
+<button onclick="loadReport()">View Report</button>
+</div>
+</div>
+
+<p id="message">Loading report...</p>
+
+<div class="stats">
+<div class="stat">Student Name<div id="name" class="value">-</div></div>
+<div class="stat">Total Days<div id="total" class="value">0</div></div>
+<div class="stat">Present Days<div id="present" class="value">0</div></div>
+<div class="stat">Absent Days<div id="absent" class="value">0</div></div>
+<div class="stat">Attendance %<div id="percentage" class="value">0%</div></div>
+</div>
+
+<div class="card">
+<h2>Date-wise History</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Date</th><th>Status</th></tr></thead>
+<tbody id="records"></tbody>
+</table>
+</div>
+</div>
+<p><a href="/">Back to Home</a></p>
+</div>
+
+<script>
+async function loadReport(){
+ const id=document.getElementById("studentId").value;
+ const from=document.getElementById("fromDate").value;
+ const to=document.getElementById("toDate").value;
+ const message=document.getElementById("message");
+ const tbody=document.getElementById("records");
+
+ if(!id || Number(id)<1){
+   message.textContent="Enter a valid Student ID.";
+   return;
+ }
+ if(from && to && from>to){
+   message.textContent="From Date cannot be after To Date.";
+   return;
+ }
+
+ message.textContent="Loading...";
+ tbody.replaceChildren();
+
+ try{
+   const params=new URLSearchParams();
+   if(from)params.set("fromDate",from);
+   if(to)params.set("toDate",to);
+
+   const response=await fetch(
+     `/api/students/${encodeURIComponent(id)}/attendance-report?${params}`
+   );
+   const data=await response.json();
+
+   if(!response.ok || data.error){
+     throw new Error(data.error || "Report could not be loaded.");
+   }
+
+   document.getElementById("name").textContent=data.studentName ?? "-";
+   document.getElementById("total").textContent=data.totalDays ?? 0;
+   document.getElementById("present").textContent=data.presentDays ?? 0;
+   document.getElementById("absent").textContent=data.absentDays ?? 0;
+   document.getElementById("percentage").textContent=
+     Number(data.attendancePercentage ?? 0).toFixed(2)+"%";
+
+   (data.records || []).forEach(record=>{
+     const tr=document.createElement("tr");
+     [record.date,record.status].forEach(value=>{
+       const td=document.createElement("td");
+       td.textContent=value ?? "-";
+       tr.appendChild(td);
+     });
+     tbody.appendChild(tr);
+   });
+
+   if(!data.records || data.records.length===0){
+     const tr=document.createElement("tr");
+     const td=document.createElement("td");
+     td.colSpan=2;
+     td.textContent="No attendance records found.";
+     tr.appendChild(td);
+     tbody.appendChild(tr);
+   }
+
+   message.textContent="Report loaded successfully.";
+ }catch(error){
+   message.textContent="Error: "+error.message;
+ }
+}
+loadReport();
+</script>
+</body>
+</html>
